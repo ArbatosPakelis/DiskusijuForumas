@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 28, 2023 at 03:05 PM
+-- Generation Time: Sep 29, 2023 at 08:22 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -37,6 +37,13 @@ CREATE TABLE `comments` (
   `Users_FK` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `comments`
+--
+
+INSERT INTO `comments` (`id`, `content`, `date`, `upvotes`, `downvotes`, `Threads_FK`, `Users_FK`) VALUES
+(4, 'bad nion', '2023-09-29', 100, 2, 2, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -48,6 +55,14 @@ CREATE TABLE `follows` (
   `Users_FK` int(11) DEFAULT NULL,
   `Pages_FK` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `follows`
+--
+
+INSERT INTO `follows` (`id`, `Users_FK`, `Pages_FK`) VALUES
+(3, 2, 1),
+(4, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -61,6 +76,14 @@ CREATE TABLE `pages` (
   `name` varchar(50) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pages`
+--
+
+INSERT INTO `pages` (`id`, `category`, `name`, `description`) VALUES
+(1, 'food', 'Sharing experiences', 'we show good food pictures'),
+(3, 'cars', 'nice cars', 'we have nice cars');
 
 -- --------------------------------------------------------
 
@@ -77,6 +100,13 @@ CREATE TABLE `threads` (
   `Pages_FK` int(11) DEFAULT NULL,
   `Users_FK` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `threads`
+--
+
+INSERT INTO `threads` (`id`, `name`, `upvotes`, `downvotes`, `lastEditDate`, `Pages_FK`, `Users_FK`) VALUES
+(2, 'nice potato', 102, 1, '2023-09-29', 1, 3);
 
 -- --------------------------------------------------------
 
@@ -100,7 +130,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `creationDate`, `email`, `isDeleted`, `deletedAt`, `status`) VALUES
-(1, 'bimbambum', 'bimbambum', '2023-09-28', 'bimbambum@gmail.com', 0, NULL, 'regular');
+(2, 'bulve', 'balta', '2023-09-29', 'bulve@gmail.com', 0, NULL, 'regular'),
+(3, 'bigman', 'bigman', '2023-09-29', 'bigman@bigman.com', NULL, NULL, 'admin');
 
 --
 -- Indexes for dumped tables
@@ -110,13 +141,17 @@ INSERT INTO `users` (`id`, `username`, `password`, `creationDate`, `email`, `isD
 -- Indexes for table `comments`
 --
 ALTER TABLE `comments`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `one1` (`Threads_FK`),
+  ADD KEY `two2` (`Users_FK`);
 
 --
 -- Indexes for table `follows`
 --
 ALTER TABLE `follows`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `one11` (`Pages_FK`),
+  ADD KEY `two22` (`Users_FK`);
 
 --
 -- Indexes for table `pages`
@@ -128,7 +163,9 @@ ALTER TABLE `pages`
 -- Indexes for table `threads`
 --
 ALTER TABLE `threads`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `one` (`Pages_FK`),
+  ADD KEY `Users_FK` (`Users_FK`);
 
 --
 -- Indexes for table `users`
@@ -144,31 +181,56 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `follows`
 --
 ALTER TABLE `follows`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `pages`
 --
 ALTER TABLE `pages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `threads`
 --
 ALTER TABLE `threads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `one1` FOREIGN KEY (`Threads_FK`) REFERENCES `threads` (`id`),
+  ADD CONSTRAINT `two2` FOREIGN KEY (`Users_FK`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `follows`
+--
+ALTER TABLE `follows`
+  ADD CONSTRAINT `one11` FOREIGN KEY (`Pages_FK`) REFERENCES `pages` (`id`),
+  ADD CONSTRAINT `two22` FOREIGN KEY (`Users_FK`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `threads`
+--
+ALTER TABLE `threads`
+  ADD CONSTRAINT `one` FOREIGN KEY (`Pages_FK`) REFERENCES `pages` (`id`),
+  ADD CONSTRAINT `threads_ibfk_1` FOREIGN KEY (`Users_FK`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
