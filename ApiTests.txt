@@ -1,0 +1,35 @@
+GET http://127.0.0.1:5000/api/v1/users
+GET http://127.0.0.1:5000/api/v1/users/2
+POST http://127.0.0.1:5000/api/v1/users/bulves/bulve/bulve@gmail.com/null/null/regular
+PATCH http://127.0.0.1:5000/api/v1/users/bulvez/zalia/bulve@gmail.com/null/null/regular/2
+DELETE http://127.0.0.1:5000/api/v1/users/4
+
+GET http://127.0.0.1:5000/api/v1/pages
+GET http://127.0.0.1:5000/api/v1/pages/1
+POST http://127.0.0.1:5000/api/v1/pages/sports/ball/look at this ball
+PATCH http://127.0.0.1:5000/api/v1/pages/sports/ball/ball is rolling/2
+DELETE http://127.0.0.1:5000/api/v1/pages/2
+
+GET http://127.0.0.1:5000/api/v1/threads/1/null
+GET http://127.0.0.1:5000/api/v1/threads/1
+POST http://127.0.0.1:5000/api/v1/threads/bulve/100/10/1/3
+PATCH http://127.0.0.1:5000/api/v1/threads/bulve/1000/100/1/2/5
+DELETE http://127.0.0.1:5000/api/v1/threads/2
+
+GET http://127.0.0.1:5000/api/v1/comments/1/null
+GET http://127.0.0.1:5000/api/v1/comments/1
+POST http://127.0.0.1:5000/api/v1/comments/nice potato/100/2/1/1
+PATCH http://127.0.0.1:5000/api/v1/comments/bad onion/100/2/1/1/2
+DELETE http://127.0.0.1:5000/api/v1/comments/4
+
+GET http://127.0.0.1:5000/api/v1/follows
+GET http://127.0.0.1:5000/api/v1/follows/3
+POST http://127.0.0.1:5000/api/v1/follows/3/3
+PATCH http://127.0.0.1:5000/api/v1/follows/3/1/7
+DELETE http://127.0.0.1:5000/api/v1/follows/2
+
+
+
+
+
+
