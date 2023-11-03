@@ -1,4 +1,4 @@
-const {pages} = require("../models");
+const {pages} = require("../models/pages");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
 

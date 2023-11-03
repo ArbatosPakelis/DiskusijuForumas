@@ -6,9 +6,24 @@ const threadsRouter = require("./routes/threadsRouter")
 const commentsRouter = require("./routes/commentsRouter")
 const followsRouter = require("./routes/followsRouter")
 // const db = require("./models");
-// const Sequelize = require('sequelize');
-// const config = require("./config/config.json")
 
+const { Sequelize } = require('sequelize');
+const config = require("./config/config.json");
+const sequelize = new Sequelize(config.development); // Use the "development" configuration
+
+sequelize.authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch((error) => {
+    console.error('Unable to connect to the database: ', error);
+  });
+
+// db.sequelize.sync().then(() => {
+//     console.log('Tables created successfully!');
+//  }).catch((error) => {
+//     console.error('Unable to create tables : ', error);
+//  });
 
 
 app.use('/api/v1/users', usersRouter);

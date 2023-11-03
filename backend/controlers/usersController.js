@@ -1,4 +1,6 @@
 const {users} = require("../models");
+
+const { Model } = require('sequelize');
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
 
@@ -79,6 +81,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
+    console.log(users, "test");
     const Users = await users.findAll();
 
     if (!Users) return next(new AppError('No users were found', 404));
