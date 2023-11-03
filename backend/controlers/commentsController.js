@@ -1,4 +1,4 @@
-const {comments} = require("../models");
+const {comments} = require("../models/comments");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
 

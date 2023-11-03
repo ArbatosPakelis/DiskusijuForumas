@@ -1,49 +1,36 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('comments', {
-    id: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true
-    },
-    content: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    date: {
-      type: DataTypes.DATEONLY,
-      allowNull: true
-    },
-    upvotes: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    downvotes: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    Threads_FK: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    Users_FK: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+'use strict';
+const {
+  Model
+} = require('sequelize');
+const users = require('./users');
+const threads = require('./threads');
+module.exports = (sequelize, DataTypes) => {
+  class comments extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(db) {
+      this.belongsTo(db.users, { foreignKey: 'users_fk' });
+      this.belongsTo(db.threads, { foreignKey: 'threads_fk' });
     }
+  }
+  comments.init({
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+    },
+    content: DataTypes.STRING,
+    upvotes: DataTypes.INTEGER,
+    downvotes: DataTypes.INTEGER,
+    users_fk: DataTypes.INTEGER,
+    threads_fk: DataTypes.INTEGER
   }, {
     sequelize,
-    tableName: 'comments',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PRIMARY",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "id" },
-        ]
-      },
-    ]
+    modelName: 'comments',
   });
+  return comments;
 };
