@@ -32,7 +32,9 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     isDeleted: DataTypes.BOOLEAN,
     status: DataTypes.STRING,
-    ForceRelogin: DataTypes.BOOLEAN
+    ForceRelogin: DataTypes.BOOLEAN,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'users',

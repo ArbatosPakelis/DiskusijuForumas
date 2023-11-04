@@ -1,4 +1,4 @@
-const {follows} = require("../models/follows");
+const {follows} = require("../models");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
 

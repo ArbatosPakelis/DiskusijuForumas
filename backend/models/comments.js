@@ -27,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     upvotes: DataTypes.INTEGER,
     downvotes: DataTypes.INTEGER,
     users_fk: DataTypes.INTEGER,
-    threads_fk: DataTypes.INTEGER
+    threads_fk: DataTypes.INTEGER,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'comments',

@@ -25,7 +25,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     category: DataTypes.STRING,
     name: DataTypes.STRING,
-    description: DataTypes.STRING
+    description: DataTypes.STRING,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'pages',

@@ -1,4 +1,4 @@
-const {threads} = require("../models/threads");
+const {threads} = require("../models");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
 

@@ -24,7 +24,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     users_fk: DataTypes.INTEGER,
-    pages_fk: DataTypes.INTEGER
+    pages_fk: DataTypes.INTEGER,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'follows',

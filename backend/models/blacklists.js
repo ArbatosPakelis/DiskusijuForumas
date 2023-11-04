@@ -22,7 +22,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     device: DataTypes.STRING,
-    users_fk: DataTypes.INTEGER
+    users_fk: DataTypes.INTEGER,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'blacklists',
