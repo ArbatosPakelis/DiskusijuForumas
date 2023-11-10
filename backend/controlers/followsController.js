@@ -1,20 +1,23 @@
 const {follows} = require("../models");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
+const auth = require('./authenticationController');
 
 exports.addFollow = catchAsync(async (req, res, next) => {
-    const params = req.params;
-    let newFollow;
+    const body = req.body;
     const existingFollow = await follows.findOne({
-         where: {Users_FK: params.val1, Pages_FK: params.val2}});
+         where: {pages_fk: body.pages_fk, users_fk: body.users_fk}});
     if(!existingFollow) {
-        newFollow = await follows.create({
-            Users_FK: params.val1,
-            Pages_FK: params.val2,
+        let newFollow = await follows.create({
+            pages_fk: body.pages_fk,
+            users_fk: body.users_fk,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
         })
+        const updateFollow = await follows.findOne({
+            where: {pages_fk: body.pages_fk, users_fk: body.users_fk}});
         res.status(200).json({
-            status:"success",
-            follow: newFollow,
+            follow: updateFollow,
           });
     }
     else{
@@ -33,14 +36,12 @@ exports.deleteFollow = catchAsync(async (req, res, next) => {
     if(!result)
     {
         res.status(200).json({
-            status: 'success',
             result: result,
         });
     }
     else
     {
         res.status(403).json({
-            status: 'failure',
             result: result,
         });
     }
@@ -53,27 +54,33 @@ exports.getFollow = catchAsync(async (req, res, next) => {
     if (!follow) return next(new AppError('No follow was found', 404));
   
     res.status(200).json({
-      status: 'success',
       follow: follow,
     });
 });
 
 exports.updateFollow = catchAsync(async (req, res, next) => {
-    const params = req.params;
-    const existingFollow = await follows.findOne({ where: {id :  params.val3}});
+    const body = req.body;
+    const existingFollow = await follows.findOne({ where: {id :  body.id}});
 
     if(!existingFollow) {
         return next(new AppError("Follow was not found", 404));
     }
 
+    const duplicateFollow = await follows.findOne({ where: {users_fk: body.users_fk, pages_fk: body.pages_fk }});
+    if(duplicateFollow != undefined && duplicateFollow.id != existingFollow.id) {
+        return next(new AppError("Follow is a duplicate", 403));
+    }
+
     let updatedFollow = await follows.update({
-        Users_FK: params.val1,
-        Pages_FK: params.val2,
-    }, { where: {id :  params.val3}})
+        pages_fk: body.pages_fk,
+        users_fk: body.users_fk,
+        updatedAt: Date.now()
+    }, { where: {id :  body.id}})
+
+    const updateFollow = await follows.findOne({ where: {users_fk: body.users_fk, pages_fk: body.pages_fk }});
 
     res.status(200).json({
-        status:"success",
-        follow: updatedFollow,
+        follow: updateFollow,
     });
 });
 
@@ -83,7 +90,6 @@ exports.getAllFollows = catchAsync(async (req, res, next) => {
     if (!Follows) return next(new AppError('No follows were found', 404));
   
     res.status(200).json({
-      status: 'success',
       follows: Follows,
     });
 });

@@ -1,28 +1,28 @@
 const {comments} = require("../models");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
+const auth = require('./authenticationController');
 
 exports.addComment = catchAsync(async (req, res, next) => {
-    const params = req.params;
+    const body = req.body;
     const newComment = await comments.create({
-        content: params.val1,
-        date: Date.now(),
-        upvotes: params.val2,
-        downvotes: params.val3,
-        Threads_FK: params.val4,
-        Users_FK: params.val5,
+        content: body.content,
+        upvotes: body.upvotes,
+        downvotes: body.downvotes,
+        threads_fk: body.threads_fk,
+        users_fk: body.users_fk,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
     })
     if(!newComment)
     {
         res.status(200).json({
-            status:"success",
             comment: newComment,
             });
     }
     else
     {
         res.status(403).json({
-            status:"failure",
             comment: newComment,
         });
     }
@@ -37,7 +37,6 @@ exports.deleteComment = catchAsync(async (req, res, next) => {
     const result = await comment.destroy({ force: true});
 
     res.status(200).json({
-        status: 'success',
         result: result,
     });
 });
@@ -49,38 +48,37 @@ exports.getComment = catchAsync(async (req, res, next) => {
     if (!comment) return next(new AppError('No comment was found', 404));
   
     res.status(200).json({
-      status: 'success',
       comments: comment,
     });
 });
 
 exports.updateComment = catchAsync(async (req, res, next) => {
-    const params = req.params;
-    const existingComment = await comments.findOne({ where: {id :  params.val6}});
+    const body = req.body;
+    const existingComment = await comments.findOne({ where: {id :  body.id}});
 
     if(!existingComment) {
         return next(new AppError("Comment was not found", 404));
     }
-    let updatedComment;
-    try
+    try // can't catch error otherwise
     {
-        updatedComment = await comments.update({
-            content: params.val1,
-            date: Date.now(),
-            upvotes: params.val2,
-            downvotes: params.val3,
-            Threads_FK: params.val4,
-            Users_FK: params.val5,
-        }, { where: {id :  params.val6}})
+        let updatedComment = await comments.update({
+            content: body.content,
+            upvotes: body.upvotes,
+            downvotes: body.downvotes,
+            threads_fk: body.threads_fk,
+            users_fk: body.users_fk,
+            updatedAt: Date.now()
+        }, { where: {id :  body.id}})
     }
     catch(err)
     {
-        return next(new AppError("Check your foreign key values", 404));
+        return next(new AppError("Check your foreign key values", 403));
     }
 
+    const updateComment = await comments.findOne({ where: {id :  body.id}});
+
     res.status(200).json({
-        status:"success",
-        comment: updatedComment,
+        comment: updateComment,
     });
 });
 
@@ -92,7 +90,6 @@ exports.getAllComments = catchAsync(async (req, res, next) => {
         Comments = await comments.findAll();
         if (!Comments || Comments.length === 0) return next(new AppError('No comments were found', 404));
         res.status(200).json({
-            status: 'success',
             comments: Comments,
         });
     }
@@ -101,7 +98,6 @@ exports.getAllComments = catchAsync(async (req, res, next) => {
         Comments = await comments.findAll({ where: {Threads_FK :  params.tid}});
         if (!Comments || Comments.length === 0) return next(new AppError('No comments were found', 404));
         res.status(200).json({
-            status: 'success',
             comments: Comments,
         });
     }

@@ -2,9 +2,8 @@
 const {
   Model
 } = require('sequelize');
-const users = require('./users');
 module.exports = (sequelize, DataTypes) => {
-  class blacklists extends Model {
+  class Tokens extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -14,20 +13,18 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(db.users, { foreignKey: 'users_fk' });
     }
   }
-  blacklists.init({
+  Tokens.init({
+    token: DataTypes.STRING,
+    users_fk: DataTypes.INTEGER
+  }, {
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
       type: DataTypes.INTEGER,
     },
-    device: DataTypes.STRING,
-    users_fk: DataTypes.INTEGER,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
-  }, {
     sequelize,
-    modelName: 'blacklists',
+    modelName: 'Tokens',
   });
-  return blacklists;
+  return Tokens;
 };
