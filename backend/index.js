@@ -6,6 +6,7 @@ const threadsRouter = require("./routes/threadsRouter")
 const commentsRouter = require("./routes/commentsRouter")
 const followsRouter = require("./routes/followsRouter")
 // const db = require("./models");
+app.use(express.json());
 
 const { Sequelize } = require('sequelize');
 const config = require("./config/config.json");

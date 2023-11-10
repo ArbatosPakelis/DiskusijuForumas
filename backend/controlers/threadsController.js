@@ -1,22 +1,23 @@
 const {threads} = require("../models");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
-
+const auth = require('./authenticationController');
 
 exports.addThread = catchAsync(async (req, res, next) => {
-    const params = req.params;
+    const body = req.body;
     let newThread;
-    const existingThread = await threads.findOne({ where: { name: params.val1}});
+    const existingThread = await threads.findOne({ where: { name: body.name}});
     if(!existingThread) {
         try
         {
             newThread = await threads.create({
-                name: params.val1,
-                upvotes: params.val2,
-                downvotes: params.val3,
-                lastEditDate: Date.now(),
-                Pages_FK: params.val4,
-                Users_FK: params.val5,
+                name: body.name,
+                upvotes: body.upvotes,
+                downvotes: body.downvotes,
+                Pages_FK: body.Pages_FK,
+                Users_FK: body.Users_FK,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
             })
         }
         catch(err)
@@ -27,7 +28,6 @@ exports.addThread = catchAsync(async (req, res, next) => {
             }
         }
         res.status(200).json({
-            status:"success",
             thread: newThread,
           });
     }
@@ -52,7 +52,6 @@ exports.deleteThread = catchAsync(async (req, res, next) => {
     }
 
     res.status(200).json({
-        status: 'success',
         result: result,
     });
 });
@@ -64,31 +63,36 @@ exports.getThread = catchAsync(async (req, res, next) => {
     if (!thread) return next(new AppError('No thread was found', 404));
   
     res.status(200).json({
-      status: 'success',
       thread: thread,
     });
 });
 
 exports.updateThread = catchAsync(async (req, res, next) => {
-    const params = req.params;
-    const existingThread = await threads.findOne({ where: {id :  params.val6}});
+    const body = req.body;
+    const existingThread = await threads.findOne({ where: {id :  body.id}});
 
     if(!existingThread) {
         return next(new AppError("thread was not found", 404));
     }
 
+    const duplicateThread = await threads.findOne({ where: {name: body.name}});
+    if(duplicateThread != undefined && duplicateThread.id != existingThread.id) {
+        return next(new AppError("Thread has a duplicate name", 403));
+    }
+
     let updatedThread = await threads.update({
-        name: params.val1,
-        upvotes: params.val2,
-        downvotes: params.val3,
-        lastEditDate: Date.now(),
-        Pages_FK: params.val4,
-        Users_FK: params.val5,
-    }, { where: {id :  params.val6}})
+        name: body.name,
+        upvotes: body.upvotes,
+        downvotes: body.downvotes,
+        pages_fk: body.pages_fk,
+        users_fk: body.users_fk,
+        updatedAt: Date.now()
+    }, { where: {id :  body.id}})
+
+    const updateThread = await threads.findOne({ where: {id :  body.id}});
 
     res.status(200).json({
-        status:"success",
-        thread: updatedThread,
+        thread: updateThread,
     });
 });
 
@@ -98,9 +102,8 @@ exports.getAllThreads = catchAsync(async (req, res, next) => {
     if(params.bonus === 'all')
     {
         Threads = await threads.findAll();
-        if (!Threads) return next(new AppError('No threads were found for the page', 404));
+        if (!Threads) return next(new AppError('No threads were found', 404));
         res.status(200).json({
-            status: 'success',
             threads: Threads,
           });
     }
@@ -109,7 +112,6 @@ exports.getAllThreads = catchAsync(async (req, res, next) => {
         Threads = await threads.findAll({ where: {Pages_FK :  params.pid}},);
         if (!Threads) return next(new AppError('No threads were found for the page', 404));
         res.status(200).json({
-            status: 'success',
             threads: Threads,
           });
     }
