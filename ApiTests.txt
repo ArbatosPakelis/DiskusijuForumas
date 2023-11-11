@@ -99,6 +99,6 @@ DELETE http://127.0.0.1:5000/api/v1/follows/2
 POST http://127.0.0.1:5000/api/v1/users/login
 {
     "username" : "kazkas",
-    "password" : "$2b$10$heH0Q6h7WE2iNXuxk8B/f.42mQvzMeQJ/3u0w0xsIwcJlrm6RYi4W"
+    "password" : "secret"
 }
 

@@ -14,15 +14,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Tokens.init({
-    token: DataTypes.STRING,
-    users_fk: DataTypes.INTEGER
-  }, {
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
       type: DataTypes.INTEGER,
     },
+    token: DataTypes.STRING,
+    users_fk: DataTypes.INTEGER
+  }, {
     sequelize,
     modelName: 'Tokens',
   });
