@@ -20,10 +20,13 @@ const authenticateRefreshToken = (req, res, next) => {
         return res.sendStatus(401);
     }
     jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
+        if (err){
+            return res.sendStatus(403);
+        }
         req.user = user;
-        next();
+        // next();
     });
+
 };
 
 module.exports = {

@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(db.follows, { foreignKey: 'users_fk' });
       this.hasMany(db.threads, { foreignKey: 'users_fk' });
       this.hasMany(db.comments, { foreignKey: 'users_fk' });
-      this.hasMany(db.tokens, { foreignKey: 'users_fk' })
+      this.hasMany(db.Tokens, { foreignKey: 'users_fk' })
     }
   }
   users.init({
