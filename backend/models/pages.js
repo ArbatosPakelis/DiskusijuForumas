@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(db) {
       this.hasMany(db.threads, { foreignKey: 'pages_fk' });
       this.hasMany(db.follows, { foreignKey: 'pages_fk' });
+      this.belongsTo(db.users, { foreignKey: 'users_fk' });
     }
   }
   pages.init({
@@ -27,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     description: DataTypes.STRING,
     createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
+    updatedAt: DataTypes.DATE,
+    users_fk: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'pages',

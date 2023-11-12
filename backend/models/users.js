@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(db.follows, { foreignKey: 'users_fk' });
       this.hasMany(db.threads, { foreignKey: 'users_fk' });
       this.hasMany(db.comments, { foreignKey: 'users_fk' });
-      this.hasMany(db.Tokens, { foreignKey: 'users_fk' })
+      this.hasMany(db.Tokens, { foreignKey: 'users_fk' });
+      this.hasMany(db.pages, { foreignKey: 'users_fk' });
     }
   }
   users.init({
@@ -29,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING,
     password: DataTypes.STRING,
     email: DataTypes.STRING,
-    isDeleted: DataTypes.BOOLEAN,
     status: DataTypes.STRING,
     ForceRelogin: DataTypes.BOOLEAN,
     createdAt: DataTypes.DATE,
