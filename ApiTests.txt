@@ -34,6 +34,7 @@ PATCH http://127.0.0.1:5000/api/v1/pages
     "category": "all",
     "name": "page222",
     "description": "page2",
+    "users_fk": "2",
     "id": "2"
 }
 DELETE http://127.0.0.1:5000/api/v1/pages/2
@@ -45,8 +46,7 @@ POST http://127.0.0.1:5000/api/v1/threads
     "name" : "thread2",
     "upvotes" : "10",
     "downvotes": "1",
-    "pages_fk": "1",
-    "users_fk": "2"
+    "pages_fk": "1"
 }
 PATCH http://127.0.0.1:5000/api/v1/threads
 {

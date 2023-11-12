@@ -11,5 +11,6 @@ router.delete('/:id', usersController.deleteUser);
 router.patch('/', usersController.updateUser);
 router.post('/login', usersController.login);
 router.post('/logout', usersController.logout); 
-router.post('/tokens', usersController.renewTokens); 
+router.post('/tokens', usersController.renewTokens);
+router.post('/signup', usersController.addUser);
 module.exports = router;

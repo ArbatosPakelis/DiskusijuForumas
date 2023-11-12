@@ -19,9 +19,6 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      isDeleted: {
-        type: Sequelize.BOOLEAN
-      },
       status: {
         type: Sequelize.STRING
       },

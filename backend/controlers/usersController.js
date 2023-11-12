@@ -41,13 +41,42 @@ exports.addUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-    const {id} = req.params;
+    auth.authenticateAccessToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
+
+    const userT = req.user;
+    if(userT === undefined)
+    {
+        return res.status(401).json({"message": "token expired"});
+    }
+    if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+
+    let id = 0;
+    if(userT.role == 'admin')
+    {
+        id = req.params.id;
+
+    }
+    else
+    {
+        id = userT.sub;
+    }
     const user = await users.findOne({ where: { id: id}});
 
     if (!user) return next(new AppError('No user was found', 404));
-    
-    const result = await user.destroy({ force: true});
 
+    const userCaller = await users.findOne({ where: { id: userT.sub}});
+
+    if(!userCaller || userCaller.ForceRelogin)
+    {
+
+        return res.status(401).json({"message": "user must relog"});
+    }
+
+    const result = await user.destroy({ force: true});
 
     res.status(200).json({
         result: result,
@@ -55,10 +84,39 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {
-    const {id} = req.params;
+    auth.authenticateAccessToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
+
+    const userT = req.user;
+    if(userT === undefined)
+    {
+        return res.status(401).json({"message": "token expired"});
+    }
+    if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+
+    let id = 0;
+    if(userT.role == 'admin')
+    {
+        id = req.params.id;
+
+    }
+    else
+    {
+        id = userT.sub;
+    }
     const user = await users.findOne({ where: { id: id}});
 
     if (!user) return next(new AppError('No user was found', 404));
+
+    const userCaller = await users.findOne({ where: { id: userT.sub}});
+
+    if(!userCaller || userCaller.ForceRelogin)
+    {
+        return res.status(401).json({"message": "user must relog"});
+    }
   
     res.status(200).json({
       status: 'success',
@@ -67,6 +125,26 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.updateUser = catchAsync(async (req, res, next) => {
+    auth.authenticateAccessToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
+
+    const userT = req.user;
+    if(userT === undefined)
+    {
+        return res.status(401).json({"message": "token expired"});
+    }
+    if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+
+    const userCaller = await users.findOne({ where: { id: userT.sub}});
+
+    if(!userCaller || userCaller.ForceRelogin)
+    {
+        return res.status(401).json({"message": "user must relog"});
+    }
+
     const body = req.body;
     const existingUser = await users.findOne({ where: {id :  body.id}});
 
@@ -79,6 +157,17 @@ exports.updateUser = catchAsync(async (req, res, next) => {
         return next(new AppError("User has a duplicate username", 403));
     }
 
+    let id = 0;
+    if(userT.role == 'admin')
+    {
+        id = body.id;
+
+    }
+    else
+    {
+        id = userT.sub;
+    }
+
     const pswd = await bcrypt.hash(body.password, 10);
     let updatedUser = await users.update({
         username: body.username,
@@ -88,9 +177,9 @@ exports.updateUser = catchAsync(async (req, res, next) => {
         status: body.status,
         ForceRelogin: body.ForceRelogin,
         updatedAt: Date.now()
-    }, { where: {id :  body.id}})
+    }, { where: {id :  id}})
 
-    const updateUser = await users.findOne({ where: {id :  body.id}});
+    const updateUser = await users.findOne({ where: {id :  id}});
 
     res.status(200).json({
         user: updateUser,
@@ -98,7 +187,24 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
+    auth.authenticateAccessToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
 
+    const userT = req.user;
+    if(userT === undefined)
+    {
+        return res.status(401).json({"message": "token expired"});
+    }
+    if(userT.role != 'admin' || Date.now() >= new Date(userT.expire))
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+    const userCaller = await users.findOne({ where: { id: userT.sub}});
+
+    if(!userCaller || userCaller.ForceRelogin)
+    {
+        return res.status(401).json({"message": "user must relog"});
+    }
     const Users = await users.findAll();
 
     if (!Users) return next(new AppError('No users were found', 404));
@@ -112,19 +218,28 @@ exports.login = catchAsync(async (req, res, next) => {
     const body = req.body;
 
     const user = await users.findOne({ where: {username: body.username}});
-    if(user.status != "regular")
-    {
-        res.status("401").send();
-    }
     if(!user)
     {
         res.status(404).send();
+    }
+    if(user.status != "regular" && user.status != "admin")
+    {
+        res.status(401).send();
     }
     try
     {
         const correct = bcrypt.compare(body.password, user.password);
         if(correct)
         {
+            let updatedUser = await users.update({
+                username: user.username,
+                password: user.password,
+                email: user.email,
+                isDeleted: user.isDeleted,
+                status: user.status,
+                ForceRelogin: false,
+                updatedAt: Date.now()
+            }, { where: {id :  user.id}})
 
             var currentTime1 = new Date();
             currentTime1.setMinutes(currentTime1.getMinutes() + 15);
@@ -185,6 +300,7 @@ exports.logout = catchAsync(async (req, res, next) => {
     if(existingToken  != null) return res.status(403);
 
     auth.authenticateRefreshToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
     const user = req.user;
     if(user.role != 'regular' && user.role != 'admin' || Date.now() >= new Date(user.expire)) res.status(401);
     
@@ -230,6 +346,7 @@ exports.renewTokens = catchAsync(async (req, res, next) => {
     }
 
     auth.authenticateRefreshToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
     const user = req.user;
     if(user.role != 'regular' && user.role != 'admin' || Date.now() >= new Date(user.expire)){
         return res.status(401);

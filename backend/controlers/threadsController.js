@@ -1,9 +1,27 @@
-const {threads} = require("../models");
+const {threads, users} = require("../models");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
 const auth = require('./authenticationController');
 
 exports.addThread = catchAsync(async (req, res, next) => {
+    auth.authenticateAccessToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
+
+    const userT = req.user;
+    if(userT === undefined)
+    {
+        return res.status(401).json({"message": "token expired"});
+    }
+    if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+    const userCaller = await users.findOne({ where: { id: userT.sub}});
+
+    if(!userCaller || userCaller.ForceRelogin)
+    {
+        return res.status(401).json({"message": "user must relog"});
+    }
     const body = req.body;
     let newThread;
     const existingThread = await threads.findOne({ where: { name: body.name}});
@@ -14,8 +32,8 @@ exports.addThread = catchAsync(async (req, res, next) => {
                 name: body.name,
                 upvotes: body.upvotes,
                 downvotes: body.downvotes,
-                Pages_FK: body.Pages_FK,
-                Users_FK: body.Users_FK,
+                pages_fk: body.pages_fk,
+                users_fk: userT.sub,
                 createdAt: Date.now(),
                 updatedAt: Date.now()
             })
@@ -37,23 +55,44 @@ exports.addThread = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteThread = catchAsync(async (req, res, next) => {
+    auth.authenticateAccessToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
+
+    const userT = req.user;
+    if(userT === undefined)
+    {
+        return res.status(401).json({"message": "token expired"});
+    }
+
     const {id} = req.params;
     const thread = await threads.findOne({ where: { id: id}});
 
     if (!thread) return next(new AppError('No thread was found', 404));
-    
+
+    if(userT.role != 'regular' && userT.role != 'admin' ||
+    Date.now() >= new Date(userT.expire) ||
+    userT.sub != thread.users_fk && userT.role != 'admin')
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+
+    const userCaller = await users.findOne({ where: { id: userT.sub}});
+
+    if(!userCaller || userCaller.ForceRelogin)
+    {
+        return res.status(401).json({"message": "user must relog"});
+    }
     try
     {
         const result = await thread.destroy({ force: true});
+        res.status(200).json({
+            result: result,
+        });
     }
     catch(err)
     {
-        return next(new AppError('Please check remove all comments before removing the thread', 403));
+        return next(new AppError('Please remove all comments before removing the thread', 403));
     }
-
-    res.status(200).json({
-        result: result,
-    });
 });
 
 exports.getThread = catchAsync(async (req, res, next) => {
@@ -68,6 +107,24 @@ exports.getThread = catchAsync(async (req, res, next) => {
 });
 
 exports.updateThread = catchAsync(async (req, res, next) => {
+    auth.authenticateAccessToken(req, res, next);
+    if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
+
+    const userT = req.user;
+    if(userT === undefined)
+    {
+        return res.status(401).json({"message": "token expired"});
+    }
+    if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+    const userCaller = await users.findOne({ where: { id: userT.sub}});
+
+    if(!userCaller || userCaller.ForceRelogin)
+    {
+        return res.status(401).json({"message": "user must relog"});
+    }
     const body = req.body;
     const existingThread = await threads.findOne({ where: {id :  body.id}});
 
@@ -75,19 +132,39 @@ exports.updateThread = catchAsync(async (req, res, next) => {
         return next(new AppError("thread was not found", 404));
     }
 
+    if(userT.role != 'regular' && userT.role != 'admin' ||
+    Date.now() >= new Date(userT.expire) ||
+    userT.sub != existingThread.users_fk && userT.role != 'admin')
+    {
+        res.status(401).json({"message": "user invalid"});
+    }
+
     const duplicateThread = await threads.findOne({ where: {name: body.name}});
     if(duplicateThread != undefined && duplicateThread.id != existingThread.id) {
         return next(new AppError("Thread has a duplicate name", 403));
     }
-
-    let updatedThread = await threads.update({
-        name: body.name,
-        upvotes: body.upvotes,
-        downvotes: body.downvotes,
-        pages_fk: body.pages_fk,
-        users_fk: body.users_fk,
-        updatedAt: Date.now()
-    }, { where: {id :  body.id}})
+    if(userT.role == 'admin')
+    {
+        let updatedThread = await threads.update({
+            name: body.name,
+            upvotes: body.upvotes,
+            downvotes: body.downvotes,
+            pages_fk: body.pages_fk,
+            users_fk: body.users_fk,
+            updatedAt: Date.now()
+        }, { where: {id :  body.id}})
+    }
+    else
+    {
+        let updatedThread = await threads.update({
+            name: body.name,
+            upvotes: body.upvotes,
+            downvotes: body.downvotes,
+            pages_fk: body.pages_fk,
+            users_fk: body.users_fk,
+            updatedAt: Date.now()
+        }, { where: {id :  body.id, users_fk: userT.sub}})
+    }
 
     const updateThread = await threads.findOne({ where: {id :  body.id}});
 

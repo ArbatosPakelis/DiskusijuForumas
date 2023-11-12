@@ -4,12 +4,17 @@ const authenticateAccessToken = (req, res, next) => {
     const header = req.headers['authorization'];
     const token = header && header.split(' ')[1];
     if (token == null) {
-        return res.sendStatus(401);
+        req.error = 401;
+        return;
     }
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
+        if (err)
+        {
+            req.error = 403;
+            return
+        }
         req.user = user;
-        next();
+        // next();
     });
 };
 
@@ -17,11 +22,14 @@ const authenticateRefreshToken = (req, res, next) => {
     const header = req.headers['authorization'];
     const token = header && header.split(' ')[1];
     if (token == null) {
-        return res.sendStatus(401);
+        req.error = 401;
+        return;
     }
     jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err){
-            return res.sendStatus(403);
+        if (err)
+        {
+            req.error = 403;
+            return
         }
         req.user = user;
         // next();
