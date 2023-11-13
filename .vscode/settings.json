@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/af159191-d04e-482d-b15c-82fc9dd096e3/resourceGroups/diskusijuForumas/providers/Microsoft.Web/sites/DiskusijuForumas",
+    "appService.deploySubpath": "."
+}
