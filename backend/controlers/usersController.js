@@ -51,7 +51,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     }
     if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
 
     let id = 0;
@@ -94,7 +94,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
     }
     if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
 
     let id = 0;
@@ -135,7 +135,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     }
     if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
 
     const userCaller = await users.findOne({ where: { id: userT.sub}});
@@ -220,11 +220,11 @@ exports.login = catchAsync(async (req, res, next) => {
     const user = await users.findOne({ where: {username: body.username}});
     if(!user)
     {
-        res.status(404).send();
+        return res.status(404).send();
     }
     if(user.status != "regular" && user.status != "admin")
     {
-        res.status(401).send();
+        return res.status(401).send();
     }
     try
     {

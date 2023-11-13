@@ -14,7 +14,7 @@ exports.addThread = catchAsync(async (req, res, next) => {
     }
     if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
     const userCaller = await users.findOne({ where: { id: userT.sub}});
 
@@ -73,7 +73,7 @@ exports.deleteThread = catchAsync(async (req, res, next) => {
     Date.now() >= new Date(userT.expire) ||
     userT.sub != thread.users_fk && userT.role != 'admin')
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
 
     const userCaller = await users.findOne({ where: { id: userT.sub}});
@@ -117,7 +117,7 @@ exports.updateThread = catchAsync(async (req, res, next) => {
     }
     if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
     const userCaller = await users.findOne({ where: { id: userT.sub}});
 
