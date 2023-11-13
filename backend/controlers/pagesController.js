@@ -15,7 +15,7 @@ exports.addPage = catchAsync(async (req, res, next) => {
     }
     if(userT.role != 'regular' && userT.role != 'admin' || Date.now() >= new Date(userT.expire))
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
     const userCaller = await users.findOne({ where: { id: userT.sub}});
 
@@ -63,7 +63,7 @@ exports.deletePage = catchAsync(async (req, res, next) => {
     Date.now() >= new Date(userT.expire) ||
     userT.sub != page.users_fk && userT.role != 'admin')
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
 
     const userCaller = await users.findOne({ where: { id: userT.sub}});
@@ -106,7 +106,7 @@ exports.updatePage = catchAsync(async (req, res, next) => {
       Date.now() >= new Date(userT.expire) ||
       userT.sub != body.users_fk && userT.role != 'admin')
     {
-        res.status(401).json({"message": "user invalid"});
+        return res.status(401).json({"message": "user invalid"});
     }
     const existingPage = await pages.findOne({ where: {id :  body.id}});
 
