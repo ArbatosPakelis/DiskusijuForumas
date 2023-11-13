@@ -6,7 +6,7 @@ const pagesRouter = require("./routes/pagesRouter");
 const threadsRouter = require("./routes/threadsRouter");
 const commentsRouter = require("./routes/commentsRouter");
 const followsRouter = require("./routes/followsRouter");
-// const db = require("./models");
+const db = require("./models");
 app.use(express.json());
 
 const { Sequelize } = require('sequelize');
@@ -21,11 +21,12 @@ sequelize.authenticate()
     console.error('Unable to connect to the database: ', error);
   });
 
-// db.sequelize.sync().then(() => {
-//     console.log('Tables created successfully!');
-//  }).catch((error) => {
-//     console.error('Unable to create tables : ', error);
-//  });
+  
+db.sequelize.sync().then(() => {
+    console.log('Tables created successfully!');
+ }).catch((error) => {
+    console.error('Unable to create tables : ', error);
+ });
 
 
 app.use('/api/v1/users', usersRouter);
