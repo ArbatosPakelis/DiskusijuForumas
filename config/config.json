@@ -14,10 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "saityno",
-    "host": "127.0.0.1",
+    "username": "freedb_5d2user",
+    "password": "7h$G&ax&UpSJ?$S",
+    "database": "freedb_saityno",
+    "host": "sql.freedb.tech",
     "dialect": "mysql"
   }
 }
