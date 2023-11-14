@@ -36,8 +36,11 @@ app.use('/api/v1/comments', commentsRouter);
 app.use('/api/v1/follows', followsRouter);
 
 // db.sequelize.sync();
-// app.use('*', (req, res, next) => {
-//     next(new AppError(`Can not find ${req.originalUrl} on this server`, 404));
-// });
+app.use('/', (req, res) => {
+  res.json({"message":"your API works !"});
+});
+app.use('*', (req, res, next) => {
+    next(new AppError(`Can not find ${req.originalUrl} on this server`, 404));
+});
 
 app.listen(5000, () => {console.log("Server started on port 5000")})
