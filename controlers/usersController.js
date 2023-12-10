@@ -272,6 +272,7 @@ exports.login = catchAsync(async (req, res, next) => {
             res.status(200).json({
                 accessToken: accessToken,
                 refreshToken: refreshToken,
+                role: user.status
             });
         }
         else
@@ -297,11 +298,14 @@ exports.logout = catchAsync(async (req, res, next) => {
     }
 
     const existingToken = await Tokens.findOne({ where: { token: token}});
+
     if(existingToken  != null) return res.status(403);
 
     auth.authenticateRefreshToken(req, res, next);
+
     if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
     const user = req.user;
+
     if(user.role != 'regular' && user.role != 'admin' || Date.now() >= new Date(user.expire)) res.status(401);
     
     let result = await Tokens.create({
