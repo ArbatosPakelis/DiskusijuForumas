@@ -34,15 +34,15 @@ exports.addComment = catchAsync(async (req, res, next) => {
     })
     if(!newComment)
     {
-        res.status(200).json({
-            comment: newComment,
-            });
-    }
-    else
-    {
         res.status(403).json({
             comment: newComment,
         });
+    }
+    else
+    {
+        res.status(200).json({
+            comment: newComment,
+            });
     }
 });
 

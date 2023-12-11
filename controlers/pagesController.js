@@ -5,9 +5,10 @@ const authenticateAccessToken = require('../controlers/usersController');
 const auth = require('./authenticationController');
 
 exports.addPage = catchAsync(async (req, res, next) => {
+    console.log(0);
     auth.authenticateAccessToken(req, res, next);
     if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
-
+    console.log(1);
     const userT = req.user;
     if(userT === undefined)
     {
