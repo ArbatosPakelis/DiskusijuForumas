@@ -272,7 +272,8 @@ exports.login = catchAsync(async (req, res, next) => {
             res.status(200).json({
                 accessToken: accessToken,
                 refreshToken: refreshToken,
-                role: user.status
+                role: user.status,
+                id: user.id
             });
         }
         else

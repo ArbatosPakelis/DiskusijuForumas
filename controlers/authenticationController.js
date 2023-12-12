@@ -10,7 +10,7 @@ const authenticateAccessToken = (req, res, next) => {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err)
         {
-            req.error = 403;
+            req.error = 401;
             return
         }
         req.user = user;
