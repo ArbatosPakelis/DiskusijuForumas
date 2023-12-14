@@ -119,7 +119,6 @@ exports.getUser = catchAsync(async (req, res, next) => {
     }
   
     res.status(200).json({
-      status: 'success',
       users: user,
     });
 });
@@ -129,6 +128,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     if(req.error !== undefined) return res.status(req.error).json({"message": "token expired or invalid"});
 
     const userT = req.user;
+
     if(userT === undefined)
     {
         return res.status(401).json({"message": "token expired"});
@@ -158,7 +158,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     }
 
     let id = 0;
-    if(userT.role == 'admin')
+    if(userT.role === 'admin')
     {
         id = body.id;
 

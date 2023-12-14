@@ -179,7 +179,7 @@ exports.getAllThreads = catchAsync(async (req, res, next) => {
     if(params.bonus === 'all')
     {
         Threads = await threads.findAll();
-        if (!Threads) return next(new AppError('No threads were found', 404));
+        if (!Threads || Threads.length === 0) return next(new AppError('No threads were found', 404));
         res.status(200).json({
             threads: Threads,
           });
@@ -187,7 +187,7 @@ exports.getAllThreads = catchAsync(async (req, res, next) => {
     else
     {
         Threads = await threads.findAll({ where: {Pages_FK :  params.pid}},);
-        if (!Threads) return next(new AppError('No threads were found for the page', 404));
+        if (!Threads || Threads.length === 0) return next(new AppError('No threads were found for the page', 404));
         res.status(200).json({
             threads: Threads,
           });
