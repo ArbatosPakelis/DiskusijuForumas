@@ -76,13 +76,13 @@ exports.deleteFollow = catchAsync(async (req, res, next) => {
 
     if(!result)
     {
-        res.status(200).json({
+        res.status(403).json({
             result: result,
         });
     }
     else
     {
-        res.status(403).json({
+        res.status(200).json({
             result: result,
         });
     }
@@ -109,7 +109,7 @@ exports.getFollow = catchAsync(async (req, res, next) => {
     }
 
     const {id} = req.params;
-    const follow = await follows.findOne({ where: { id: id}});
+    const follow = await follows.findOne({ where: { pages_fk: id, users_fk:userT.sub}});
 
     if (!follow) return next(new AppError('No follow was found', 404));
     if(userT.role == 'regular' && userT.sub != follow.users_fk) return res.status(401).json("Can't get follow from other users");
