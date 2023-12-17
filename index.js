@@ -10,9 +10,8 @@ const db = require("./models");
 const cors = require('cors');
 app.use(express.json());
 
-const corsOptions = {
-  origin: 'https://diskusiju-forumas-frontend-46917224cc75.herokuapp.com',
-};
+const allowedOrigin = 'https://diskusiju-forumas-frontend-46917224cc75.herokuapp.com';
+
 app.use(cors({
   origin: allowedOrigin,
   credentials: true,
