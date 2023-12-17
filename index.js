@@ -8,12 +8,15 @@ const commentsRouter = require("./routes/commentsRouter");
 const followsRouter = require("./routes/followsRouter");
 const db = require("./models");
 const cors = require('cors');
-app.use(cors());
 app.use(express.json());
 
 const corsOptions = {
   origin: 'https://diskusiju-forumas-frontend-46917224cc75.herokuapp.com',
 };
+app.use(cors({
+  origin: allowedOrigin,
+  credentials: true,
+}));
 
 const { Sequelize } = require('sequelize');
 const config = require("./config/config.json");
